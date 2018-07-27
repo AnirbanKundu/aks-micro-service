@@ -1,6 +1,12 @@
 # Azure Kubernetes Micro Service 
 This repository will walk you through on how to setup your AKS cluster, create your own Azure Registry, create a service principal so that AKS cluster can access the Azure Registry.
-Once the RBAC is created, you can upload your local Docker Image to the Registry. And then instruct AKS to deploy image. 
+Once the RBAC is created, you can upload your local Docker Image to the Registry. And then instruct AKS to deploy image. Before you start venturing into AKS, please ensure to have 
+   - kubectl (brew install kubernetes-cli)
+   - azure-cli ()
+   - node (brew install node)
+   - gulp (npm install gulp -g)
+   
+   installed
 
 ### Step-1
 Once you have created your "Free Trial" account through https://portal.azure.com switch to azure-cli 
@@ -60,5 +66,41 @@ Now create an AKS cluster with clustername `cluster-1`
   To verify the connection to your cluster, run
   
   `kubectl get nodes`
+  
+### Step-5 
+Download the code from  https://github.com/AnirbanKundu/aks-micro-service.git. To build the application run:
+```
+  npm install
+  gulp dist  
+```
+Now create the docker file, using the following command:
+```
+docker build -t node-web-svc .
+```
 
+To know the ACR login server URL run the following command :
+```
+az acr show --name myResourceG --resource-group myResourceGroup
+```
+The output of the command shows the ACR uri - in this case, the URI is `"loginServer": "myresourceg.azurecr.io"`
+Now tag your local image as : 
+```
+docker tag node-web-svc:1.0 myresourceg.azurecr.io/node-web-svc:v1
+```
+Push the image to the ACR server 
+```
+docker push myresourceg.azurecr.io/node-web-svc:v1
+```
+Using the `Deployment.yaml` file create the __deployment__ and __service__ 
+Using the following command it is done 
+```
+kubectl apply -f Deployment.yaml 
+```
+### Step-6 
+To test the application, check if the Kubernetes service is created which exposes the application to the internet. This process can take a few minutes. To monitor progress, use 
+```
+kubectl get service node-web-svc --watch
+```
+Once the EXTERNAL-IP address has changed from pending to an IP address, use CTRL-C to stop the kubectl watch process.
+The current service is available http://23.96.27.6:9002/get 
 
