@@ -104,3 +104,6 @@ kubectl get service node-web-svc --watch
 Once the EXTERNAL-IP address has changed from pending to an IP address, use CTRL-C to stop the kubectl watch process.
 The current service is available http://23.96.27.6:9002/get 
 
+### OSBA 
+`az aks get-credentials --resource-group myResourceGroup --name osba-quickstart-cluster --admin`
+
